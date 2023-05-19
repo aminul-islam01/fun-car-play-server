@@ -28,23 +28,31 @@ async function run() {
         await client.connect();
         const carCollections = client.db('funCarPlayDB').collection('cars');
 
-        app.get('/cars', async(req, res) => {
+        app.get('/cars', async (req, res) => {
             const cars = await carCollections.find().toArray();
             res.send(cars);
         })
 
-        app.get('/cars/:category', async(req, res) => {
+        app.get('/cars/:category', async (req, res) => {
             const subCategory = req.params.category;
-            const result = await carCollections.find({sub_category: subCategory}).toArray();
+            const result = await carCollections.find({ sub_category: subCategory }).toArray();
             res.send(result);
         })
 
-        app.get('/singleCar/:id', async(req, res) => {
+        app.get('/singleCar/:id', async (req, res) => {
             const id = req.params.id;
-            const car = {_id: new ObjectId(id)}
-            const result = await carCollections.findOne({_id: new ObjectId(req.params.id)});
+            const car = { _id: new ObjectId(id) }
+            const result = await carCollections.findOne({ _id: new ObjectId(req.params.id) });
             res.send(result)
         })
+
+        app.get("/getCarsByText/:text", async(req, res) => {
+            const text = req.params.text;
+            const result = await carCollections
+                .find({name: { $regex: text, $options: "i" }})
+                .toArray();
+            res.send(result);
+        });
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
