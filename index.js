@@ -33,6 +33,12 @@ async function run() {
             res.send(cars);
         })
 
+        app.get('/cars/:category', async(req, res) => {
+            const subCategory = req.params.category;
+            const result = await carCollections.find({sub_category: subCategory}).toArray();
+            res.send(result);
+        })
+
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
