@@ -34,6 +34,21 @@ async function run() {
             res.send(result)
         })
 
+        app.put('updateCars/:id', async(req, res) => {
+            const id = req.params.id;
+            const body = req.body;
+            const filter = {_id: new ObjectId(id)};
+            const updateDoc = {
+                $set: {
+                    price: body.price,
+                    quantity: body.quantity,
+                    description: body.description,
+                },
+            };
+            const result = await carCollections.updateOne(filter, updateDoc);
+            res.send(result)
+        })
+
         app.get('/cars', async (req, res) => {
             const cars = await carCollections.find().toArray();
             res.send(cars);
@@ -57,6 +72,7 @@ async function run() {
             const query = {seller_email: email}
             const result = await carCollections.find(query).toArray()
             res.send(result)
+            console.log(email)
         })
 
         app.get("/getCarsByText/:text", async(req, res) => {
