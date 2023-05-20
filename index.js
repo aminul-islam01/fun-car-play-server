@@ -52,13 +52,20 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/getCarByEmail/:email', async(req, res) => {
+            const email = req.params.email;
+            const query = {seller_email: email}
+            const result = await carCollections.find(query).toArray()
+            res.send(result)
+        })
+
         app.get("/getCarsByText/:text", async(req, res) => {
             const text = req.params.text;
             const result = await carCollections
                 .find({name: { $regex: text, $options: "i" }})
                 .toArray();
             res.send(result);
-        });
+        })
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
