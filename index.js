@@ -25,8 +25,14 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
         const carCollections = client.db('funCarPlayDB').collection('cars');
+
+        app.post('/cars', async(req, res) => {
+            const car = req.body;
+            const result = await carCollections.insertOne(car);
+            res.send(result)
+        })
 
         app.get('/cars', async (req, res) => {
             const cars = await carCollections.find().toArray();
