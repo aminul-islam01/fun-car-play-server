@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        // await client.connect();
+        client.connect();
         const carCollections = client.db('funCarPlayDB').collection('cars');
 
         app.post('/cars', async(req, res) => {
@@ -34,19 +34,28 @@ async function run() {
             res.send(result)
         })
 
-        app.put('updateCars/:id', async(req, res) => {
+        app.put('/cars/:id', async(req, res) => {
             const id = req.params.id;
             const body = req.body;
             const filter = {_id: new ObjectId(id)};
-            const updateDoc = {
+            const options = {upsert: true}
+            const updateToy = {
                 $set: {
                     price: body.price,
                     quantity: body.quantity,
                     description: body.description,
-                },
+                }
             };
-            const result = await carCollections.updateOne(filter, updateDoc);
+            const result = await carCollections.updateOne(filter, updateToy, options);
             res.send(result)
+        })
+
+        app.delete('/cars/:id', async(req, res) => {
+            const id = req.params.id;
+           
+            const query = {_id: new ObjectId(id)}
+            const result = await carCollections.deleteOne(query);
+            res.send(result);
         })
 
         app.get('/cars', async (req, res) => {
@@ -60,10 +69,10 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/singleCar/:id', async (req, res) => {
+        app.get('/cars/:id', async (req, res) => {
             const id = req.params.id;
-            const car = { _id: new ObjectId(id) }
-            const result = await carCollections.findOne({ _id: new ObjectId(req.params.id) });
+            const query = {_id: new ObjectId(id)}
+            const result = await carCollections.findOne(query).toArray();
             res.send(result)
         })
 
@@ -72,7 +81,6 @@ async function run() {
             const query = {seller_email: email}
             const result = await carCollections.find(query).toArray()
             res.send(result)
-            console.log(email)
         })
 
         app.get("/getCarsByText/:text", async(req, res) => {
